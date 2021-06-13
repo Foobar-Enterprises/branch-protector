@@ -3,8 +3,7 @@ payload.json
 .env
 *.tfvars
 
-terraform/.terraform.lock.hcl
-terraform/.terraform/
+terraform/.terraform*
 terraform/commands.sh
 terraform/terraform.tfstate
 terraform/terraform.tfstate.backup
