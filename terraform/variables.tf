@@ -3,16 +3,6 @@ variable "aws_region" {
   default = "us-east-1"
 }
 
-variable "aws_profile" {
-  type    = string
-  default = "default"
-}
-
-variable "vpc_id" {
-  type    = string
-  default = "vpc-028ff079"
-}
-
 variable "vpc_cidr" {
   description = "Please entere cidr block"
   type        = string
