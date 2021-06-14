@@ -1,13 +1,10 @@
 from hmac import compare_digest
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import binascii
-import cgi
 import hashlib
 import hmac
 import json
 import os
 import requests
-import time
 
 # Why not just pass environment variables when the container is run? Because
 # they're visible outside the container. They become part of the description of
