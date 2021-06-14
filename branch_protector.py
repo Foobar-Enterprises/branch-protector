@@ -42,7 +42,7 @@ def protectRepo(request):
   }
   response = requests.put(url, data=json.dumps(data), auth=(os.environ['GITHUB_USERNAME'], os.environ['GITHUB_PERSONAL_ACCESS_TOKEN']))
   if response.status_code != 200:
-    raise Exception(f'Failed to request branch protection. Code {response.status_code}, response: {response.text}')
+    raise Exception(f'Failed to request branch protection for {repo_name}, branch {main_branch}. Code {response.status_code}, response: {response.text}')
 
   url = f'https://api.github.com/repos/{repo_name}/issues'
   data = {
@@ -58,38 +58,54 @@ def checkSignature(signature, body):
   calculated_signature = 'sha256=' + hmac.new(bytes(secret, 'utf-8'), bytes(body, 'utf-8'), hashlib.sha256).hexdigest()
   return compare_digest(signature, calculated_signature)
 
+def doWebhook(request_handler):
+  content_length = int(request_handler.headers['Content-Length'] or 0)
+  body = request_handler.rfile.read(content_length).decode('utf-8')
+
+  if not checkSignature(request_handler.headers.get('X-Hub-Signature-256', ''), body):
+    request_handler.send_response(403)
+    request_handler.send_header('Content-Type', 'application/json')
+    request_handler.end_headers()
+    request_handler.wfile.write(bytes('{"error": "unauthorized"}', 'utf-8'))
+    return
+
+  request = json.loads(body)
+  if request.get('action', '') == 'created':
+    request_handler.send_response(200)
+    request_handler.send_header('Content-Type', 'application/json')
+    request_handler.end_headers()
+    protectRepo(request)
+    request_handler.wfile.write(bytes('{"message": "protected branch"}', 'utf-8'))
+  else:
+    request_handler.send_response(200)
+    request_handler.send_header('Content-Type', 'application/json')
+    request_handler.end_headers()
+    request_handler.wfile.write(bytes('{"message": "no action taken"}', 'utf-8'))
+
+def do404(request_handler):
+  request_handler.send_response(404)
+  request_handler.send_header('Content-Type', 'text/html')
+  request_handler.end_headers()
+  request_handler.wfile.write(bytes('not found', 'utf-8'))
+
+def doHealthcheck(request_handler):
+  request_handler.send_response(200)
+  request_handler.send_header('Content-Type', 'application/json')
+  request_handler.end_headers()
+  request_handler.wfile.write(bytes('{"success":true}', 'utf-8'))
+
 class server(BaseHTTPRequestHandler):
   def do_POST(self):
-    content_length = int(self.headers['Content-Length'])
-    body = self.rfile.read(content_length).decode('utf-8')
-
-    if not checkSignature(self.headers.get('X-Hub-Signature-256', ''), body):
-      self.send_response(403)
-      self.send_header('Content-Type', 'application/json')
-      self.end_headers()
-      self.wfile.write(bytes('{"success": "false", "error": "unauthorized"}', 'utf-8'))
-      return
-
-    request = json.loads(body)
-
-    if request.get('action', '') == 'created':
-      self.send_response(200)
-      self.send_header('Content-Type', 'application/json')
-      self.end_headers()
-      protectRepo(request)
-      self.wfile.write(bytes('{"message": "protected branch"}', 'utf-8'))
-      return
-
-    self.send_response(200)
-    self.send_header('Content-Type', 'application/json')
-    self.end_headers()
-    self.wfile.write(bytes('{"message":"nothing to do here"}', 'utf-8'))
+    if self.path == '/webhook':
+      doWebhook(self)
+    else:
+      do404(self)
 
   def do_GET(self):
-    self.send_response(200)
-    self.send_header('Content-Type', 'text/html')
-    self.end_headers()
-    self.wfile.write(bytes('Nothing to see here.', 'utf-8'))
+    if self.path == '/health':
+      doHealthcheck(self)
+    else:
+      do404(self)
 
 if __name__ == '__main__':
   getSecrets()

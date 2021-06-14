@@ -4,16 +4,6 @@ output "lb_dns" {
 }
 
 output "app_url" {
-  description = "DNS of the Application Load Balancer"
-  value = "http://${aws_lb.branch_protector.dns_name}:8080"
+  description = "Webhook URL"
+  value = "http://${aws_lb.branch_protector.dns_name}:8080/webhook"
 }
-
-#data "aws_instances" "branch_protector_asg" {
-#  instance_tags = {
-#    Name = "branch_protector"
-#  }
-#}
-#
-#output "ec2-public-ips" {
-#  value = data.aws_instances.branch_protector_asg.public_ips
-#}
