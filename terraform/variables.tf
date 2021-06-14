@@ -3,10 +3,9 @@ variable "aws_region" {
   default = "us-east-1"
 }
 
-variable "vpc_cidr" {
-  description = "Please entere cidr block"
-  type        = string
-  default     = "192.168.50.0/24"
+variable "vpc_id" {
+  type    = string
+  default = "vpc-028ff079"
 }
 
 variable "ssh_key" {
