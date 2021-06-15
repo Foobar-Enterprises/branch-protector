@@ -14,7 +14,7 @@ Click [here](https://docs.github.com/en/developers/webhooks-and-events/webhooks/
 To provide a quick demonstration, I've provided a Terraform script that will deploy the application through an autoscale group behind an application load balancer. This script will create all the resources for you, except it currently assumes you already have a VPC with an internet gateway attached. To spin up your own copy, simply browser to the `./terraform` directory and type `terraform apply`. It will prompt you for a few variables, including, including:
 
 * VPC ID
-* AWS region (the code currently assumes us-east-1 in one spot - I may fix this later)
+* AWS region
 * Your public SSH key
 * Subnets to place your EC2 instances in
 * GitHub secrets in JSON format
