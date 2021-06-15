@@ -38,7 +38,7 @@ sudo yum install -y docker jq &&
 sudo usermod -a -G docker ec2-user &&
 sudo service docker start &&
 sudo docker pull jodawill1989/branch_protector:latest &&
-aws ssm get-parameter --name /branch_protector/github_secret --region us-east-1 --with-decryption | jq -r .Parameter.Value > /tmp/github_secret.json
+aws ssm get-parameter --name /branch_protector/github_secret --region ${var.aws_region} --with-decryption | jq -r .Parameter.Value > /tmp/github_secret.json
 sudo docker run -it --rm -v /tmp/github_secret.json:/run/secrets/github.json -d -p 8080:8080 --name branch_protector jodawill1989/branch_protector:latest
 EOF
 }
