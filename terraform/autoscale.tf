@@ -5,11 +5,11 @@ resource "aws_placement_group" "branch_protector" {
 
 resource "aws_autoscaling_group" "branch_protector" {
   name                      = "branch_protector"
-  max_size                  = 1
-  min_size                  = 1
+  max_size                  = var.autoscale_max_size
+  min_size                  = var.autoscale_min_size
   health_check_grace_period = 300
   health_check_type         = "EC2"
-  desired_capacity          = 1
+  desired_capacity          = var.autoscale_desired_size
   force_delete              = true
   placement_group           = aws_placement_group.branch_protector.id
   launch_configuration      = aws_launch_configuration.branch_protector.name

@@ -20,6 +20,11 @@ To provide a quick demonstration, I've provided a Terraform script that will dep
 * GitHub secrets in JSON format
 * AWS access key
 * AWS secret key
+* Autoscale minimum number of instances
+* Autoscale maximum number of instances
+* Autoscale desired number of instances
+
+For high availability, the minimum number of instances should be at least two.
 
 When you apply the script, the output will present the webhook URL based on the ALB's DNS.
 
