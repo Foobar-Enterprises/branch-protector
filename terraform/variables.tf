@@ -35,3 +35,18 @@ variable "aws_secret_key" {
   type        = string
   sensitive   = true
 }
+
+variable "autoscale_max_size" {
+  description = "Autoscale group maximum number of instances"
+  type        = number
+}
+
+variable "autoscale_min_size" {
+  description = "Autoscale group minimum number of instances"
+  type        = number
+}
+
+variable "autoscale_desired_size" {
+  description = "Autoscale group desired number of instances"
+  type        = number
+}
